@@ -1,28 +1,10 @@
-﻿class Greeter {
-    element: HTMLElement;
-    span: HTMLElement;
-    timerToken: number;
-
-    constructor(element: HTMLElement) {
-        this.element = element;
-        this.element.innerHTML += "The time is: ";
-        this.span = document.createElement('span');
-        this.element.appendChild(this.span);
-        this.span.innerText = new Date().toUTCString();
-    }
-
-    start() {
-        this.timerToken = setInterval(() => this.span.innerHTML = new Date().toUTCString(), 500);
-    }
-
-    stop() {
-        clearTimeout(this.timerToken);
-    }
-
-}
-
-window.onload = () => {
-    var el = document.getElementById('content');
-    var greeter = new Greeter(el);
-    greeter.start();
-};
+﻿var canvas = document.getElementById("canvas");
+var stage = new createjs.Stage(canvas);
+//rect.beginFill("#CEF4B5");
+var circle = new createjs.Shape();
+circle.graphics.beginFill("red").drawCircle(0, 0, 40);
+circle.x = 400;
+circle.y = 200;
+stage.addChild(circle);
+stage.update();
+console.log(canvas);
