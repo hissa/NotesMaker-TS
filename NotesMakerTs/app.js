@@ -7,11 +7,6 @@ var App = (function () {
         this.initialize();
         this.setAreas();
         this.drawBackgrounds();
-        //var aLine = new Area(
-        //    Point.zero(), new Point(100, 100)
-        //);
-        //var alineShape = this.makeBackgroundShape(aLine, "blue");
-        //this.stage.addChild(alineShape);
         this.dicideLaneArea();
         this.drawLanes();
         this.stage.update();
@@ -42,7 +37,7 @@ var App = (function () {
     App.drawBackgrounds = function () {
         var BackgroundMenuBar = this.makeBackgroundShape(this.areas.menuBar, "gray");
         this.stage.addChild(BackgroundMenuBar);
-        var BackgroundScoreArea = this.makeBackgroundShape(this.areas.ScoreArea, "skyblue");
+        var BackgroundScoreArea = this.makeBackgroundShape(this.areas.ScoreArea, "PaleTurquoise");
         this.stage.addChild(BackgroundScoreArea);
         var BackgroundToolBoxArea = this.makeBackgroundShape(this.areas.ToolBoxArea, "green");
         this.stage.addChild(BackgroundToolBoxArea);
@@ -61,7 +56,6 @@ var App = (function () {
         var height = this.areas.ScoreArea.bottomRight.y - top * 2;
         var pointCursorX = this.areas.ScoreArea.topLeft.x;
         while (true) {
-            console.log(pointCursorX /* + lanePadding + this.laneWidth >= this.areas.ScoreArea.bottomRight.x*/);
             if (pointCursorX + lanePadding + this.laneWidth >= this.areas.ScoreArea.bottomRight.x) {
                 break;
             }
@@ -76,6 +70,8 @@ var App = (function () {
             laneBackgrounds.push(this.makeBackgroundShape(this.laneAreas[i], "gray"));
             this.stage.addChild(laneBackgrounds[i]);
         }
+    };
+    App.dicideDelimitLine = function () {
     };
     App.laneWidth = 100;
     return App;
