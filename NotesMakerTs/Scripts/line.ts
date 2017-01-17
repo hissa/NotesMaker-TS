@@ -2,7 +2,7 @@
     public a: Point;
     public b: Point;
 
-    constructor(a, b) {
+    constructor(a: Point, b: Point) {
         this.a = a;
         this.b = b;
     }

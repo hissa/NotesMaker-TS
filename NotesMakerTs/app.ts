@@ -1,4 +1,6 @@
-﻿/// <reference path="scripts/line.ts" />
+﻿/// <reference path="scripts/bar.ts" />
+/// <reference path="scripts/note.ts" />
+/// <reference path="scripts/line.ts" />
 /// <reference path="scripts/point.ts" />
 /// <reference path="scripts/area.ts" />
 /// <reference path="scripts/settings.ts" />
@@ -16,8 +18,10 @@ class App {
         ScoreArea: Area;
         ToolBoxArea: Area;
     };
-    private static laneWidth: number = 100;
+    private static laneWidth: number = 150;
+    private static heightOfBeat: number = 25;
     private static laneAreas: Area[];
+    private static bars: Bar[];
 
     public static main(): void {
         this.initialize();
@@ -26,6 +30,7 @@ class App {
         this.dicideLaneArea();
         this.drawLanes();
         this.drawLaneDelimitLine();
+        this.drawBars();
         this.stage.update();
     }
 
@@ -43,6 +48,10 @@ class App {
             ScoreArea: new Area(Point.zero(), Point.zero()),
             ToolBoxArea: new Area(Point.zero(), Point.zero())
         };
+        this.bars = new Array();
+        for (var i = 0; i <= 12; i++) {
+            this.bars.push(new Bar());
+        }
     }
 
     private static setAreas(): void {
@@ -125,6 +134,31 @@ class App {
             }
         }
     }
+
+    private static drawBars(): void {
+        var pointCursor = this.laneAreas[0].topLeft.copy();
+        var laneCursor = 0;
+        for (var i = 0; i < this.bars.length; i++) {
+            var currentBar = this.bars[i];
+            var barHeight = currentBar.beat * this.heightOfBeat;
+            if (pointCursor.y + barHeight > this.laneAreas[0].bottomRight.y) {
+                if (laneCursor + 1 > this.laneAreas.length - 1) {
+                    break;
+                } else {
+                    laneCursor++;
+                    pointCursor = this.laneAreas[laneCursor].topLeft.copy();
+                }
+            }
+            var lineEnd = pointCursor.copy();
+            lineEnd.x = this.laneAreas[laneCursor].bottomRight.x;
+            var line = new Line(pointCursor, lineEnd);
+            var shape = this.makeLineShape(line, 1, Settings.colors.scoreLaneDelimitLine);
+            this.stage.addChild(shape);
+            pointCursor.y += barHeight;
+        }
+    }
+
+    // 高さとレーンを指定して小節線を描くメソッドを用意したほうが良い
 }
 
 App.main();

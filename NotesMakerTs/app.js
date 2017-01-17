@@ -1,3 +1,5 @@
+/// <reference path="scripts/bar.ts" />
+/// <reference path="scripts/note.ts" />
 /// <reference path="scripts/line.ts" />
 /// <reference path="scripts/point.ts" />
 /// <reference path="scripts/area.ts" />
@@ -12,6 +14,7 @@ var App = (function () {
         this.dicideLaneArea();
         this.drawLanes();
         this.drawLaneDelimitLine();
+        this.drawBars();
         this.stage.update();
     };
     App.initialize = function () {
@@ -28,6 +31,10 @@ var App = (function () {
             ScoreArea: new Area(Point.zero(), Point.zero()),
             ToolBoxArea: new Area(Point.zero(), Point.zero())
         };
+        this.bars = new Array();
+        for (var i = 0; i <= 12; i++) {
+            this.bars.push(new Bar());
+        }
     };
     App.setAreas = function () {
         this.areas.menuBar =
@@ -93,7 +100,31 @@ var App = (function () {
             }
         }
     };
-    App.laneWidth = 100;
+    App.drawBars = function () {
+        var pointCursor = this.laneAreas[0].topLeft.copy();
+        var laneCursor = 0;
+        for (var i = 0; i < this.bars.length; i++) {
+            var currentBar = this.bars[i];
+            var barHeight = currentBar.beat * this.heightOfBeat;
+            if (pointCursor.y + barHeight > this.laneAreas[0].bottomRight.y) {
+                if (laneCursor + 1 > this.laneAreas.length - 1) {
+                    break;
+                }
+                else {
+                    laneCursor++;
+                    pointCursor = this.laneAreas[laneCursor].topLeft.copy();
+                }
+            }
+            var lineEnd = pointCursor.copy();
+            lineEnd.x = this.laneAreas[laneCursor].bottomRight.x;
+            var line = new Line(pointCursor, lineEnd);
+            var shape = this.makeLineShape(line, 1, Settings.colors.scoreLaneDelimitLine);
+            this.stage.addChild(shape);
+            pointCursor.y += barHeight;
+        }
+    };
+    App.laneWidth = 150;
+    App.heightOfBeat = 25;
     return App;
 }());
 App.main();
