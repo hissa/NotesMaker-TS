@@ -10,4 +10,12 @@
     public static zero(): Point{
         return new Point(0, 0);
     }
+
+    public static copy(point: Point): Point {
+        return new Point(point.x, point.y);
+    }
+
+    public copy(): Point {
+        return Point.copy(this);
+    }
 }

@@ -1,5 +1,7 @@
-﻿/// <reference path="scripts/point.ts" />
+﻿/// <reference path="scripts/line.ts" />
+/// <reference path="scripts/point.ts" />
 /// <reference path="scripts/area.ts" />
+/// <reference path="scripts/settings.ts" />
 class App {
     public static canvasArea: Area;
     public static stage: createjs.Stage;
@@ -23,6 +25,7 @@ class App {
         this.drawBackgrounds();
         this.dicideLaneArea();
         this.drawLanes();
+        this.drawLaneDelimitLine();
         this.stage.update();
     }
 
@@ -54,11 +57,14 @@ class App {
     }
 
     private static drawBackgrounds(): void {
-        var BackgroundMenuBar = this.makeBackgroundShape(this.areas.menuBar, "gray");
+        var BackgroundMenuBar =
+            this.makeBackgroundShape(this.areas.menuBar, Settings.colors.menuBarBackground);
         this.stage.addChild(BackgroundMenuBar);
-        var BackgroundScoreArea = this.makeBackgroundShape(this.areas.ScoreArea, "PaleTurquoise");
+        var BackgroundScoreArea =
+            this.makeBackgroundShape(this.areas.ScoreArea, Settings.colors.scoreAreaBackground);
         this.stage.addChild(BackgroundScoreArea);
-        var BackgroundToolBoxArea = this.makeBackgroundShape(this.areas.ToolBoxArea, "green");
+        var BackgroundToolBoxArea =
+            this.makeBackgroundShape(this.areas.ToolBoxArea, Settings.colors.toolBoxAreaBackground);
         this.stage.addChild(BackgroundToolBoxArea);
         this.stage.update();
     }
@@ -67,6 +73,14 @@ class App {
         var shape = new createjs.Shape();
         shape.graphics.beginFill(color).
             drawRect(area.topLeft.x, area.topLeft.y, area.getWidth(), area.getHeight());
+        return shape;
+    }
+
+    private static makeLineShape(line: Line, wight: number, color: string): createjs.Shape {
+        var shape = new createjs.Shape();
+        shape.graphics.beginStroke(color);
+        shape.graphics.moveTo(line.a.x, line.a.y);
+        shape.graphics.lineTo(line.b.x, line.b.y);
         return shape;
     }
 
@@ -93,13 +107,23 @@ class App {
         var laneBackgrounds = new Array();
         for (var i = 0; i <= this.laneAreas.length - 1; i++) {
             laneBackgrounds.push(
-                this.makeBackgroundShape(this.laneAreas[i], "gray")
+                this.makeBackgroundShape(this.laneAreas[i], Settings.colors.scoreLaneBackground)
             );
             this.stage.addChild(laneBackgrounds[i]);
         }
     }
 
-    private static dicideDelimitLine(): void {
+    private static drawLaneDelimitLine(): void {
+        var lengthwiseLaneWidth = this.laneWidth / 5;
+        for (var i = 0; i <= this.laneAreas.length - 1; i++) {
+            for (var j = 1; j <= 4; j++) {
+                var line = new Line(this.laneAreas[i].topLeft.copy(), this.laneAreas[i].bottomRight.copy());
+                line.a.x += lengthwiseLaneWidth * j;
+                line.b.x = line.a.x;
+                var lineShape = this.makeLineShape(line, 1, Settings.colors.scoreLaneDelimitLine);
+                this.stage.addChild(lineShape);
+            }
+        }
     }
 }
 

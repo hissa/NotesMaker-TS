@@ -10,6 +10,12 @@ var Area = (function () {
     Area.prototype.getHeight = function () {
         return this.bottomRight.y - this.topLeft.y;
     };
+    Area.copy = function (area) {
+        return new Area(area.topLeft.copy(), area.bottomRight.copy());
+    };
+    Area.prototype.copy = function () {
+        return Area.copy(this);
+    };
     return Area;
 }());
 //# sourceMappingURL=area.js.map

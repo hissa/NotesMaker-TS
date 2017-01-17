@@ -15,4 +15,12 @@ class Area {
     public getHeight(): number {
         return this.bottomRight.y - this.topLeft.y;
     }
+
+    public static copy(area: Area): Area {
+        return new Area(area.topLeft.copy(),area.bottomRight.copy());
+    }
+
+    public copy(): Area {
+        return Area.copy(this);
+    }
 }

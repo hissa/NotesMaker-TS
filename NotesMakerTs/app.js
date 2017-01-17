@@ -1,5 +1,7 @@
+/// <reference path="scripts/line.ts" />
 /// <reference path="scripts/point.ts" />
 /// <reference path="scripts/area.ts" />
+/// <reference path="scripts/settings.ts" />
 var App = (function () {
     function App() {
     }
@@ -9,6 +11,7 @@ var App = (function () {
         this.drawBackgrounds();
         this.dicideLaneArea();
         this.drawLanes();
+        this.drawLaneDelimitLine();
         this.stage.update();
     };
     App.initialize = function () {
@@ -35,11 +38,11 @@ var App = (function () {
             new Area(new Point(this.canvasArea.getWidth() - this.viewSettings.weightOfToolBar, this.viewSettings.heightOfMenuBar), new Point(this.canvasArea.getWidth(), this.canvasArea.getHeight()));
     };
     App.drawBackgrounds = function () {
-        var BackgroundMenuBar = this.makeBackgroundShape(this.areas.menuBar, "gray");
+        var BackgroundMenuBar = this.makeBackgroundShape(this.areas.menuBar, Settings.colors.menuBarBackground);
         this.stage.addChild(BackgroundMenuBar);
-        var BackgroundScoreArea = this.makeBackgroundShape(this.areas.ScoreArea, "PaleTurquoise");
+        var BackgroundScoreArea = this.makeBackgroundShape(this.areas.ScoreArea, Settings.colors.scoreAreaBackground);
         this.stage.addChild(BackgroundScoreArea);
-        var BackgroundToolBoxArea = this.makeBackgroundShape(this.areas.ToolBoxArea, "green");
+        var BackgroundToolBoxArea = this.makeBackgroundShape(this.areas.ToolBoxArea, Settings.colors.toolBoxAreaBackground);
         this.stage.addChild(BackgroundToolBoxArea);
         this.stage.update();
     };
@@ -47,6 +50,13 @@ var App = (function () {
         var shape = new createjs.Shape();
         shape.graphics.beginFill(color).
             drawRect(area.topLeft.x, area.topLeft.y, area.getWidth(), area.getHeight());
+        return shape;
+    };
+    App.makeLineShape = function (line, wight, color) {
+        var shape = new createjs.Shape();
+        shape.graphics.beginStroke(color);
+        shape.graphics.moveTo(line.a.x, line.a.y);
+        shape.graphics.lineTo(line.b.x, line.b.y);
         return shape;
     };
     App.dicideLaneArea = function () {
@@ -67,11 +77,21 @@ var App = (function () {
     App.drawLanes = function () {
         var laneBackgrounds = new Array();
         for (var i = 0; i <= this.laneAreas.length - 1; i++) {
-            laneBackgrounds.push(this.makeBackgroundShape(this.laneAreas[i], "gray"));
+            laneBackgrounds.push(this.makeBackgroundShape(this.laneAreas[i], Settings.colors.scoreLaneBackground));
             this.stage.addChild(laneBackgrounds[i]);
         }
     };
-    App.dicideDelimitLine = function () {
+    App.drawLaneDelimitLine = function () {
+        var lengthwiseLaneWidth = this.laneWidth / 5;
+        for (var i = 0; i <= this.laneAreas.length - 1; i++) {
+            for (var j = 1; j <= 4; j++) {
+                var line = new Line(this.laneAreas[i].topLeft.copy(), this.laneAreas[i].bottomRight.copy());
+                line.a.x += lengthwiseLaneWidth * j;
+                line.b.x = line.a.x;
+                var lineShape = this.makeLineShape(line, 1, Settings.colors.scoreLaneDelimitLine);
+                this.stage.addChild(lineShape);
+            }
+        }
     };
     App.laneWidth = 100;
     return App;
