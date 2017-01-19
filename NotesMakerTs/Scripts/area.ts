@@ -20,7 +20,30 @@ class Area {
         return new Area(area.topLeft.copy(),area.bottomRight.copy());
     }
 
+    public getLeft(): number {
+        return this.topLeft.x;
+    }
+
+    public getTop(): number {
+        return this.topLeft.y;
+    }
+
+    public getRight(): number {
+        return this.bottomRight.x;
+    }
+
+    public getBottom(): number {
+        return this.bottomRight.y;
+    }
+
     public copy(): Area {
         return Area.copy(this);
+    }
+
+    public makeShape(color: string): createjs.Shape {
+        var shape = new createjs.Shape();
+        shape.graphics.beginFill(color).
+            drawRect(this.getLeft(), this.getTop(), this.getWidth(), this.getHeight());
+        return shape;
     }
 }

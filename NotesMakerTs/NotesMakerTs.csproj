@@ -29,7 +29,9 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="app.ts" />
+    <TypeScriptCompile Include="Scripts\applicationError.ts" />
     <TypeScriptCompile Include="Scripts\area.ts" />
+    <TypeScriptCompile Include="Scripts\lanearea.ts" />
     <TypeScriptCompile Include="Scripts\line.ts" />
     <TypeScriptCompile Include="Scripts\point.ts" />
     <TypeScriptCompile Include="Scripts\settings.ts" />

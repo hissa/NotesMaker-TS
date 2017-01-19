@@ -14,4 +14,12 @@
     public copy(): Line {
         return Line.copy(this);
     }
+
+    public makeShape(color: string): createjs.Shape {
+        var shape = new createjs.Shape();
+        shape.graphics.beginStroke(color);
+        shape.graphics.moveTo(this.a.x, this.a.y);
+        shape.graphics.lineTo(this.b.x, this.b.y);
+        return shape;
+    }
 }

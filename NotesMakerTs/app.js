@@ -3,6 +3,8 @@
 /// <reference path="scripts/line.ts" />
 /// <reference path="scripts/point.ts" />
 /// <reference path="scripts/area.ts" />
+/// <reference path="scripts/lanearea.ts" />
+/// <reference path="scripts/applicationerror.ts" />
 /// <reference path="scripts/settings.ts" />
 var App = (function () {
     function App() {
@@ -45,26 +47,13 @@ var App = (function () {
             new Area(new Point(this.canvasArea.getWidth() - this.viewSettings.weightOfToolBar, this.viewSettings.heightOfMenuBar), new Point(this.canvasArea.getWidth(), this.canvasArea.getHeight()));
     };
     App.drawBackgrounds = function () {
-        var BackgroundMenuBar = this.makeBackgroundShape(this.areas.menuBar, Settings.colors.menuBarBackground);
+        var BackgroundMenuBar = this.areas.menuBar.makeShape(Settings.colors.menuBarBackground);
         this.stage.addChild(BackgroundMenuBar);
-        var BackgroundScoreArea = this.makeBackgroundShape(this.areas.ScoreArea, Settings.colors.scoreAreaBackground);
+        var BackgroundScoreArea = this.areas.ScoreArea.makeShape(Settings.colors.scoreAreaBackground);
         this.stage.addChild(BackgroundScoreArea);
-        var BackgroundToolBoxArea = this.makeBackgroundShape(this.areas.ToolBoxArea, Settings.colors.toolBoxAreaBackground);
+        var BackgroundToolBoxArea = this.areas.ToolBoxArea.makeShape(Settings.colors.toolBoxAreaBackground);
         this.stage.addChild(BackgroundToolBoxArea);
         this.stage.update();
-    };
-    App.makeBackgroundShape = function (area, color) {
-        var shape = new createjs.Shape();
-        shape.graphics.beginFill(color).
-            drawRect(area.topLeft.x, area.topLeft.y, area.getWidth(), area.getHeight());
-        return shape;
-    };
-    App.makeLineShape = function (line, wight, color) {
-        var shape = new createjs.Shape();
-        shape.graphics.beginStroke(color);
-        shape.graphics.moveTo(line.a.x, line.a.y);
-        shape.graphics.lineTo(line.b.x, line.b.y);
-        return shape;
     };
     App.dicideLaneArea = function () {
         var lanePadding = this.laneWidth * (1 / 5);
@@ -76,7 +65,7 @@ var App = (function () {
             if (pointCursorX + lanePadding + this.laneWidth >= this.areas.ScoreArea.bottomRight.x) {
                 break;
             }
-            var area = new Area(new Point(pointCursorX + lanePadding, top), new Point(pointCursorX + lanePadding + this.laneWidth, top + height));
+            var area = new LaneArea(new Point(pointCursorX + lanePadding, top), new Point(pointCursorX + lanePadding + this.laneWidth, top + height));
             this.laneAreas.push(area);
             pointCursorX = area.bottomRight.x;
         }
@@ -84,20 +73,18 @@ var App = (function () {
     App.drawLanes = function () {
         var laneBackgrounds = new Array();
         for (var i = 0; i <= this.laneAreas.length - 1; i++) {
-            laneBackgrounds.push(this.makeBackgroundShape(this.laneAreas[i], Settings.colors.scoreLaneBackground));
+            laneBackgrounds.push(this.laneAreas[i].makeShape(Settings.colors.scoreLaneBackground));
             this.stage.addChild(laneBackgrounds[i]);
         }
     };
     App.drawLaneDelimitLine = function () {
-        var lengthwiseLaneWidth = this.laneWidth / 5;
-        for (var i = 0; i <= this.laneAreas.length - 1; i++) {
-            for (var j = 1; j <= 4; j++) {
-                var line = new Line(this.laneAreas[i].topLeft.copy(), this.laneAreas[i].bottomRight.copy());
-                line.a.x += lengthwiseLaneWidth * j;
-                line.b.x = line.a.x;
-                var lineShape = this.makeLineShape(line, 1, Settings.colors.scoreLaneDelimitLine);
-                this.stage.addChild(lineShape);
-            }
+        var lanedelimitLine = new Array();
+        for (var i = 0; i < this.laneAreas.length; i++) {
+            var tempAry = this.laneAreas[i].makeDelimitLines(Settings.colors.scoreLaneDelimitLine);
+            lanedelimitLine = lanedelimitLine.concat(tempAry);
+        }
+        for (var i = 0; i < lanedelimitLine.length; i++) {
+            this.stage.addChild(lanedelimitLine[i]);
         }
     };
     App.drawBars = function () {
@@ -118,7 +105,7 @@ var App = (function () {
             var lineEnd = pointCursor.copy();
             lineEnd.x = this.laneAreas[laneCursor].bottomRight.x;
             var line = new Line(pointCursor, lineEnd);
-            var shape = this.makeLineShape(line, 1, Settings.colors.scoreLaneDelimitLine);
+            var shape = line.makeShape(Settings.colors.scoreLaneDelimitLine);
             this.stage.addChild(shape);
             pointCursor.y += barHeight;
         }
