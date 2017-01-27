@@ -34,7 +34,7 @@ var App = (function () {
             ToolBoxArea: new Area(Point.zero(), Point.zero())
         };
         this.bars = new Array();
-        for (var i = 0; i <= 12; i++) {
+        for (var i = 0; i < 12; i++) {
             this.bars.push(new Bar());
         }
     };
@@ -88,30 +88,41 @@ var App = (function () {
         }
     };
     App.drawBars = function () {
-        var pointCursor = this.laneAreas[0].topLeft.copy();
+        var heightCursor = 0;
         var laneCursor = 0;
         for (var i = 0; i < this.bars.length; i++) {
+            var drawEndLine = false;
             var currentBar = this.bars[i];
             var barHeight = currentBar.beat * this.heightOfBeat;
-            if (pointCursor.y + barHeight > this.laneAreas[0].bottomRight.y) {
+            if (heightCursor + barHeight > this.laneAreas[0].getHeight()) {
+                // 小節を閉じる線を描画する
+                // breakやレーンが進んだ時にバグるのでここは先にやっておく
+                var shape = this.laneAreas[laneCursor].makeBarLineShape(heightCursor, Settings.colors.scoreLaneDelimitLine);
+                this.stage.addChild(shape);
                 if (laneCursor + 1 > this.laneAreas.length - 1) {
                     break;
                 }
                 else {
                     laneCursor++;
-                    pointCursor = this.laneAreas[laneCursor].topLeft.copy();
+                    heightCursor = 0;
                 }
             }
-            var lineEnd = pointCursor.copy();
-            lineEnd.x = this.laneAreas[laneCursor].bottomRight.x;
-            var line = new Line(pointCursor, lineEnd);
-            var shape = line.makeShape(Settings.colors.scoreLaneDelimitLine);
+            if (!(i + 1 < this.bars.length)) {
+                drawEndLine = true;
+            }
+            var lineHeight = heightCursor;
+            var shape = this.laneAreas[laneCursor].makeBarLineShape(lineHeight, Settings.colors.scoreLaneDelimitLine);
             this.stage.addChild(shape);
-            pointCursor.y += barHeight;
+            heightCursor += barHeight;
+            if (drawEndLine) {
+                // 小節を閉じる線を描画する
+                var shape = this.laneAreas[laneCursor].makeBarLineShape(heightCursor, Settings.colors.scoreLaneDelimitLine);
+                this.stage.addChild(shape);
+            }
         }
     };
     App.laneWidth = 150;
-    App.heightOfBeat = 25;
+    App.heightOfBeat = 30;
     return App;
 }());
 App.main();
