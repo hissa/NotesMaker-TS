@@ -34,6 +34,31 @@ var Area = (function () {
             drawRect(this.getLeft(), this.getTop(), this.getWidth(), this.getHeight());
         return shape;
     };
+    Area.prototype.IsInnerThisArea = function (point) {
+        if (point.x < this.getLeft() || point.x > this.getRight()) {
+            return false;
+        }
+        if (point.y < this.getTop() || point.y > this.getBottom()) {
+            return false;
+        }
+        return true;
+    };
+    Area.prototype.PublicPointToLocalPoint = function (publicPoint) {
+        if (!this.IsInnerThisArea(publicPoint)) {
+            throw new ApplicationError("指定されたポイントがこのエリア内ではありません。");
+        }
+        var x = publicPoint.x - this.getLeft();
+        var y = publicPoint.y - this.getTop();
+        return new Point(x, y);
+    };
+    Area.prototype.LocalPointToPublicPoint = function (localPoint) {
+        if (localPoint.x > this.getWidth() || localPoint.y > this.getHeight()) {
+            throw new ApplicationError("指定されたポイントがこのエリアの大きさを超えています。");
+        }
+        var x = localPoint.x + this.getLeft();
+        var y = localPoint.y + this.getTop();
+        return new Point(x, y);
+    };
     return Area;
 }());
 //# sourceMappingURL=area.js.map

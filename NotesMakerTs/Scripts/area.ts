@@ -46,4 +46,32 @@ class Area {
             drawRect(this.getLeft(), this.getTop(), this.getWidth(), this.getHeight());
         return shape;
     }
+
+    public IsInnerThisArea(point: Point): boolean {
+        if (point.x < this.getLeft() || point.x > this.getRight()) {
+            return false;
+        }
+        if (point.y < this.getTop() || point.y > this.getBottom()) {
+            return false;
+        }
+        return true;
+    }
+
+    public PublicPointToLocalPoint(publicPoint: Point): Point {
+        if (!this.IsInnerThisArea(publicPoint)) {
+            throw new ApplicationError("指定されたポイントがこのエリア内ではありません。");
+        }
+        var x = publicPoint.x - this.getLeft();
+        var y = publicPoint.y - this.getTop();
+        return new Point(x, y);
+    }
+
+    public LocalPointToPublicPoint(localPoint: Point): Point {
+        if (localPoint.x > this.getWidth() || localPoint.y > this.getHeight()) {
+            throw new ApplicationError("指定されたポイントがこのエリアの大きさを超えています。");
+        }
+        var x = localPoint.x + this.getLeft();
+        var y = localPoint.y + this.getTop();
+        return new Point(x, y);
+    }
 }

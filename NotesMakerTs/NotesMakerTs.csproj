@@ -31,6 +31,7 @@
     <TypeScriptCompile Include="app.ts" />
     <TypeScriptCompile Include="Scripts\applicationError.ts" />
     <TypeScriptCompile Include="Scripts\area.ts" />
+    <TypeScriptCompile Include="Scripts\bar.ts" />
     <TypeScriptCompile Include="Scripts\lanearea.ts" />
     <TypeScriptCompile Include="Scripts\line.ts" />
     <TypeScriptCompile Include="Scripts\point.ts" />
