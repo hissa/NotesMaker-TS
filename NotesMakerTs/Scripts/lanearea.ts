@@ -1,6 +1,6 @@
 ﻿class LaneArea extends Area {
     public getHeightFromInLane(value: number): number {
-        if (value > this.getHeight()) {
+        if (!(this.isInnerHeightThisArea(value))) {
             throw new ApplicationError(
                 "valueがLaneの高さを超えています。"
             );
@@ -11,7 +11,8 @@
     }
 
     public getHeightFromBottom(value: number): number {
-        if (value > this.getHeight()) {
+        if (!this.isInnerHeightThisArea(value)) {
+            console.log(value);
             throw new ApplicationError(
                 "valueがLaneの高さを超えています。"
             );
@@ -19,6 +20,13 @@
         var origin = this.bottomRight.y;
         var heightFromBottom = origin - value;
         return heightFromBottom;
+    }
+
+    public isInnerHeightThisArea(value: number): boolean {
+        if (value > this.getHeight()) {
+            return false;
+        }
+        return true;
     }
 
     public makeBarLineShape(heightFromBottom: number, color: string): createjs.Shape {

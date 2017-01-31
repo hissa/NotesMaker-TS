@@ -3,6 +3,7 @@ var Area = (function () {
     function Area(topLeft, bottomRight) {
         this.topLeft = topLeft;
         this.bottomRight = bottomRight;
+        this.normalize();
     }
     Area.prototype.getWidth = function () {
         return this.bottomRight.x - this.topLeft.x;
@@ -34,7 +35,7 @@ var Area = (function () {
             drawRect(this.getLeft(), this.getTop(), this.getWidth(), this.getHeight());
         return shape;
     };
-    Area.prototype.IsInnerThisArea = function (point) {
+    Area.prototype.isInnerThisArea = function (point) {
         if (point.x < this.getLeft() || point.x > this.getRight()) {
             return false;
         }
@@ -43,21 +44,40 @@ var Area = (function () {
         }
         return true;
     };
-    Area.prototype.PublicPointToLocalPoint = function (publicPoint) {
-        if (!this.IsInnerThisArea(publicPoint)) {
+    Area.prototype.publicPointToLocalPoint = function (publicPoint) {
+        if (!this.isInnerThisArea(publicPoint)) {
             throw new ApplicationError("指定されたポイントがこのエリア内ではありません。");
         }
         var x = publicPoint.x - this.getLeft();
         var y = publicPoint.y - this.getTop();
         return new Point(x, y);
     };
-    Area.prototype.LocalPointToPublicPoint = function (localPoint) {
+    Area.prototype.localPointToPublicPoint = function (localPoint) {
         if (localPoint.x > this.getWidth() || localPoint.y > this.getHeight()) {
             throw new ApplicationError("指定されたポイントがこのエリアの大きさを超えています。");
         }
         var x = localPoint.x + this.getLeft();
         var y = localPoint.y + this.getTop();
         return new Point(x, y);
+    };
+    Area.prototype.normalize = function () {
+        if (this.topLeft.x > this.bottomRight.x) {
+            var tmp = this.topLeft.copy();
+            this.topLeft.x = this.bottomRight.x;
+            this.bottomRight.x = tmp.x;
+        }
+        if (this.topLeft.y > this.bottomRight.y) {
+            var tmp = this.topLeft.copy();
+            this.topLeft.y = this.bottomRight.y;
+            this.bottomRight.y = tmp.y;
+        }
+    };
+    Area.prototype.makeDiagonalShape = function (color) {
+        var shape = new createjs.Shape();
+        shape.graphics.beginStroke(color);
+        shape.graphics.moveTo(this.topLeft.x, this.topLeft.y).
+            lineTo(this.bottomRight.x, this.bottomRight.y);
+        return shape;
     };
     return Area;
 }());

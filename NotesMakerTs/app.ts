@@ -100,12 +100,17 @@ class App {
     }
 
     private static drawLanes(): void {
-        var laneBackgrounds = new Array();
+        console.log(this.laneAreas[0].topLeft);
+        var clickEventHandler = (e: createjs.MouseEvent) => {
+            console.log(e.stageX, e.stageY);
+        };
+        var laneBackgrounds: createjs.Shape[] = new Array();
         for (var i = 0; i <= this.laneAreas.length - 1; i++) {
             laneBackgrounds.push(
                 this.laneAreas[i].makeShape(Settings.colors.scoreLaneBackground)
             );
             this.stage.addChild(laneBackgrounds[i]);
+            laneBackgrounds[i].on("click", clickEventHandler);
         }
     }
 
@@ -120,47 +125,41 @@ class App {
         }
     }
 
-    private static drawBars(): void {
+    private static disideBars(): void {
         var heightCursor = 0;
         var laneCursor = 0;
         for (var i = 0; i < this.bars.length; i++) {
-            var drawEndLine = false;
-            var currentBar = this.bars[i];
-            var barHeight = currentBar.beat * this.heightOfBeat;
-            if (heightCursor + barHeight > this.laneAreas[0].getHeight()) {
-                // 小節を閉じる線を描画する
-                // breakやレーンが進んだ時にバグるのでここは先にやっておく
-                var shape = this.laneAreas[laneCursor].makeBarLineShape(
-                    heightCursor, Settings.colors.scoreLaneDelimitLine
-                );
-                this.stage.addChild(shape);
+            var barHeight = this.bars[i].beat * this.heightOfBeat;
+            // これ以上小節を描画できない場合は終了するか、次のレーンに移る。
+            if (this.laneAreas[laneCursor].getHeight() < heightCursor + barHeight) {
                 if (laneCursor + 1 > this.laneAreas.length - 1) {
                     break;
-                } else {                    
+                } else {
                     laneCursor++;
                     heightCursor = 0;
                 }
             }
-            if (!(i + 1 < this.bars.length)) {
-                drawEndLine = true;
-            }
-            var lineHeight = heightCursor;
-            var shape = this.laneAreas[laneCursor].makeBarLineShape(
-                lineHeight, Settings.colors.scoreLaneDelimitLine
-            );
-            this.stage.addChild(shape);
+            var currentLane = this.laneAreas[laneCursor];
+            var beginY = currentLane.getHeightFromBottom(heightCursor);
+            var endY = currentLane.getHeightFromBottom(heightCursor + barHeight);
+            var topLeft = new Point(currentLane.getLeft(), beginY);
+            var bottomRight = new Point(currentLane.getRight(), endY);
+            this.bars[i].area = new Area(topLeft, bottomRight);
+            this.bars[i].lane = currentLane;
             heightCursor += barHeight;
-            if (drawEndLine) {
-                // 小節を閉じる線を描画する
-                var shape = this.laneAreas[laneCursor].makeBarLineShape(
-                    heightCursor, Settings.colors.scoreLaneDelimitLine
-                );
+        }
+    }
+
+    private static drawBars(): void {
+        this.disideBars();
+        for (var i = 0; i < this.bars.length; i++) {
+            if (this.bars[i].area != null) {
+                var drawHeight = this.bars[i].lane.publicPointToLocalPoint(this.bars[i].area.bottomRight).y;
+                var shape = this.bars[i].lane.makeBarLineShape(drawHeight, Settings.colors.scoreLaneDelimitLine);
                 this.stage.addChild(shape);
             }
         }
     }
-
-    // 高さとレーンを指定して小節線を描くメソッドを用意したほうが良い
 }
 
 App.main();

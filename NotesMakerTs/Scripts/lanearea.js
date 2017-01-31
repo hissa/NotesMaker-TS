@@ -9,7 +9,7 @@ var LaneArea = (function (_super) {
         _super.apply(this, arguments);
     }
     LaneArea.prototype.getHeightFromInLane = function (value) {
-        if (value > this.getHeight()) {
+        if (!(this.isInnerHeightThisArea(value))) {
             throw new ApplicationError("valueがLaneの高さを超えています。");
         }
         var origin = this.topLeft.y;
@@ -17,12 +17,19 @@ var LaneArea = (function (_super) {
         return heightInLane;
     };
     LaneArea.prototype.getHeightFromBottom = function (value) {
-        if (value > this.getHeight()) {
+        if (!this.isInnerHeightThisArea(value)) {
+            console.log(value);
             throw new ApplicationError("valueがLaneの高さを超えています。");
         }
         var origin = this.bottomRight.y;
         var heightFromBottom = origin - value;
         return heightFromBottom;
+    };
+    LaneArea.prototype.isInnerHeightThisArea = function (value) {
+        if (value > this.getHeight()) {
+            return false;
+        }
+        return true;
     };
     LaneArea.prototype.makeBarLineShape = function (heightFromBottom, color) {
         var height = this.getHeightFromBottom(heightFromBottom);

@@ -6,6 +6,7 @@ class Area {
     constructor(topLeft: Point, bottomRight: Point) {
         this.topLeft = topLeft;
         this.bottomRight = bottomRight;
+        this.normalize();
     }
 
     public getWidth(): number {
@@ -47,7 +48,7 @@ class Area {
         return shape;
     }
 
-    public IsInnerThisArea(point: Point): boolean {
+    public isInnerThisArea(point: Point): boolean {
         if (point.x < this.getLeft() || point.x > this.getRight()) {
             return false;
         }
@@ -57,8 +58,8 @@ class Area {
         return true;
     }
 
-    public PublicPointToLocalPoint(publicPoint: Point): Point {
-        if (!this.IsInnerThisArea(publicPoint)) {
+    public publicPointToLocalPoint(publicPoint: Point): Point {
+        if (!this.isInnerThisArea(publicPoint)) {
             throw new ApplicationError("指定されたポイントがこのエリア内ではありません。");
         }
         var x = publicPoint.x - this.getLeft();
@@ -66,12 +67,33 @@ class Area {
         return new Point(x, y);
     }
 
-    public LocalPointToPublicPoint(localPoint: Point): Point {
+    public localPointToPublicPoint(localPoint: Point): Point {
         if (localPoint.x > this.getWidth() || localPoint.y > this.getHeight()) {
             throw new ApplicationError("指定されたポイントがこのエリアの大きさを超えています。");
         }
         var x = localPoint.x + this.getLeft();
         var y = localPoint.y + this.getTop();
         return new Point(x, y);
+    }
+
+    public normalize(): void {
+        if (this.topLeft.x > this.bottomRight.x) {
+            var tmp = this.topLeft.copy();
+            this.topLeft.x = this.bottomRight.x;
+            this.bottomRight.x = tmp.x;
+        }
+        if (this.topLeft.y > this.bottomRight.y) {
+            var tmp = this.topLeft.copy();
+            this.topLeft.y = this.bottomRight.y;
+            this.bottomRight.y = tmp.y;
+        }
+    }
+
+    public makeDiagonalShape(color: string): createjs.Shape{
+        var shape = new createjs.Shape();
+        shape.graphics.beginStroke(color);
+        shape.graphics.moveTo(this.topLeft.x, this.topLeft.y).
+            lineTo(this.bottomRight.x, this.bottomRight.y);
+        return shape;
     }
 }
